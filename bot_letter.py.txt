@@ -1,0 +1,41 @@
+import os
+from telegram import Update
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+
+TOKEN = os.environ.get("TOKEN")
+
+# ? conversor aesthetic
+def aesthetic(texto):
+    normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+    bonito = (
+        "?b?d?fgh?jk?m?o?qrst?v?x?z"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "0123456789"
+    )
+
+    resultado = ""
+
+    for c in texto:
+        if c in normal:
+            index = normal.index(c)
+            resultado += bonito[index]
+        else:
+            resultado += c
+
+    return resultado
+
+
+# ?? responde cualquier texto
+async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    texto = update.message.text
+    convertido = aesthetic(texto)
+    await update.message.reply_text(convertido)
+
+
+# ?? BOT
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, responder))
+
+app.run_polling()
